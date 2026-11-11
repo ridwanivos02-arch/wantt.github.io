@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Game Download</title>
+<style>
+:root{
+  --bg:#0b0d14;
+  --bg-soft:#0f1117;
+  --card:#161a26;
+  --card-hover:#1d2230;
+  --text:#f2f3f7;
+  --muted:#9aa0b4;
+  --accent:#ff4d4d;
+  --accent-2:#ff7a45;
+  --glow:rgba(255,77,77,.45);
+  --line:#262b3c;
+  --radius:16px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  background:
+    radial-gradient(1200px 600px at 10% -10%, rgba(255,77,77,.10), transparent 60%),
+    radial-gradient(1000px 500px at 110% 10%, rgba(45,108,255,.10), transparent 60%),
+    var(--bg);
+  color:var(--text);
+  font-family:system-ui,Segoe UI,Roboto,Arial,sans-serif;
+  min-height:100vh;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+
+/* ================= HEADER ================= */
+header{
+  position:sticky;top:0;z-index:50;
+  display:flex;align-items:center;gap:14px;
+  padding:14px 20px;
+  background:rgba(15,17,23,.72);
+  backdrop-filter:blur(14px);
+  -webkit-backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--line);
+  box-shadow:0 8px 30px rgba(0,0,0,.35);
+}
+#burger{
+  background:linear-gradient(135deg,#232838,#181c28);
+  border:1px solid var(--line);
+  color:var(--text);
+  font-size:22px;
+  width:42px;height:42px;
+  border-radius:12px;
+  cursor:pointer;line-height:1;
+  transition:transform .2s, box-shadow .2s, border-color .2s;
+  display:grid;place-items:center;
+}
+#burger:hover{
+  transform:translateY(-2px);
+  border-color:var(--accent);
+  box-shadow:0 0 0 4px rgba(255,77,77,.12), 0 8px 20px rgba(0,0,0,.35);
+}
+#burger:active{transform:scale(.94)}
+header h1{
+  font-size:20px;cursor:pointer;
+  background:linear-gradient(90deg,#fff 30%,var(--accent));
+  -webkit-background-clip:text;background-clip:text;
+  -webkit-text-fill-color:transparent;
+  letter-spacing:.3px;
+  transition:filter .2s;
+}
+header h1:hover{filter:brightness(1.25)}
+
+/* ================= MENU DRAWER ================= */
+#overlay{
+  position:fixed;inset:0;
+  background:rgba(0,0,0,.6);
+  backdrop-filter:blur(3px);
+  display:none;z-index:60;
+  opacity:0;transition:opacity .3s;
+}
+#overlay.open{display:block;opacity:1}
+#drawer{
+  position:fixed;top:0;left:-320px;
+  width:290px;height:100%;
+  background:linear-gradient(180deg,#171b28,#0f1219);
+  z-index:70;padding:24px 20px;
+  transition:left .35s cubic-bezier(.4,0,.2,1);
+  border-right:1px solid var(--line);
+  box-shadow:20px 0 60px rgba(0,0,0,.5);
+}
+#drawer.open{left:0}
+#drawer h2{
+  margin-bottom:22px;font-size:18px;
+  display:flex;align-items:center;gap:8px;
+  color:#fff;
+}
+#drawer h2::after{
+  content:"";flex:1;height:1px;
+  background:linear-gradient(90deg,var(--line),transparent);
+}
+#drawer a{
+  display:block;padding:13px 16px;
+  margin-bottom:10px;
+  border-radius:12px;
+  background:linear-gradient(135deg,#25d366,#128c4b);
+  color:#fff;text-decoration:none;font-weight:700;
+  box-shadow:0 6px 18px rgba(37,211,102,.25);
+  transition:transform .2s, box-shadow .2s;
+}
+#drawer a:hover{transform:translateX(4px);box-shadow:0 8px 24px rgba(37,211,102,.4)}
+#drawer button.home{
+  width:100%;text-align:left;
+  padding:13px 16px;margin-bottom:10px;
+  border-radius:12px;
+  background:var(--card);
+  border:1px solid var(--line);
+  color:var(--text);font-size:16px;cursor:pointer;
+  transition:background .2s, transform .2s, border-color .2s;
+}
+#drawer button.home:hover{
+  background:var(--card-hover);
+  border-color:var(--accent);
+  transform:translateX(4px);
+}
+
+/* ================= WRAP ================= */
+.wrap{max-width:1920px;margin:0 auto}
+
+/* ================= SLIDER ================= */
+.slider{
+  position:relative;
+  width:calc(100% - 32px);
+  max-width:1200px;
+  margin:20px auto 0;
+  aspect-ratio:3/1;
+  overflow:hidden;
+  border-radius:22px;
+  background:#151927;
+  border:1px solid var(--line);
+  box-shadow:0 20px 60px rgba(0,0,0,.5), inset 0 0 0 1px rgba(255,255,255,.04);
+  touch-action:pan-y;
+}
+.track{
+  display:flex;height:100%;
+  transition:transform .7s cubic-bezier(.4,0,.2,1);
+}
+.slide{
+  min-width:100%;height:100%;
+  background:#2a2e3d center/cover no-repeat;
+  position:relative;display:flex;align-items:flex-end;
+  overflow:hidden;
+}
+.slide::after{
+  content:"";position:absolute;inset:0;
+  background:linear-gradient(180deg,transparent 40%,rgba(0,0,0,.8));
+  pointer-events:none;
+}
+.slide div{
+  position:relative;z-index:2;
+  padding:20px 26px;width:100%;
+  animation:fadeUp .7s ease both;
+}
+.slide h2{
+  font-size:clamp(16px,3vw,38px);
+  text-shadow:0 4px 20px rgba(0,0,0,.7);
+  letter-spacing:.3px;
+}
+.slide p{
+  color:#e1e4ee;font-size:clamp(11px,1.5vw,18px);
+  margin-top:6px;text-shadow:0 2px 10px rgba(0,0,0,.7);
+}
+@keyframes fadeUp{
+  from{opacity:0;transform:translateY(20px)}
+  to{opacity:1;transform:translateY(0)}
+}
+
+/* dots */
+.dots{
+  position:absolute;bottom:14px;right:18px;
+  display:flex;gap:8px;z-index:3;
+}
+.dots i{
+  width:10px;height:10px;border-radius:50%;
+  background:rgba(255,255,255,.35);
+  cursor:pointer;
+  transition:width .3s, background .3s, box-shadow .3s;
+}
+.dots i.on{
+  width:26px;border-radius:6px;
+  background:linear-gradient(90deg,var(--accent),var(--accent-2));
+  box-shadow:0 0 12px var(--glow);
+}
+
+/* ================= SECTION ================= */
+.section{padding:28px 20px}
+.section h3{
+  margin-bottom:18px;font-size:21px;
+  display:flex;align-items:center;gap:10px;
+}
+.section h3::after{
+  content:"";flex:1;height:1px;
+  background:linear-gradient(90deg,var(--line),transparent);
+}
+
+/* ================= GRID & CARD ================= */
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(170px,1fr));
+  gap:18px;
+}
+.card{
+  position:relative;
+  background:linear-gradient(180deg,var(--card),#11141e);
+  border-radius:var(--radius);
+  overflow:hidden;
+  border:1px solid var(--line);
+  cursor:pointer;
+  transition:transform .3s cubic-bezier(.4,0,.2,1), box-shadow .3s, border-color .3s;
+  will-change:transform;
+}
+.card::before{
+  content:"";position:absolute;inset:0;
+  border-radius:var(--radius);
+  padding:1px;
+  background:linear-gradient(135deg,rgba(255,77,77,.6),transparent 40%,transparent 60%,rgba(45,108,255,.6));
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor;
+  mask-composite:exclude;
+  opacity:0;transition:opacity .35s;
+  pointer-events:none;
+  z-index:3;
+}
+.card:hover{
+  transform:translateY(-8px) scale(1.015);
+  box-shadow:0 24px 50px rgba(0,0,0,.55), 0 0 0 1px rgba(255,77,77,.15);
+  border-color:transparent;
+}
+.card:hover::before{opacity:1}
+.card .img{
+  aspect-ratio:1/1;
+  background:#2a2e3d center/cover no-repeat;
+  transition:transform .5s ease, filter .5s ease;
+}
+.card:hover .img{transform:scale(1.08);filter:brightness(1.1)}
+.card .t{padding:12px 12px 14px;position:relative;z-index:2}
+.card .t b{
+  display:block;font-size:15px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  transition:color .2s;
+}
+.card:hover .t b{color:var(--accent)}
+.card .t span{color:var(--muted);font-size:12px}
+.card button{
+  margin-top:10px;width:100%;padding:9px;
+  border:0;border-radius:10px;
+  background:linear-gradient(135deg,var(--accent),var(--accent-2));
+  color:#fff;font-weight:700;cursor:pointer;
+  position:relative;overflow:hidden;
+  transition:transform .2s, box-shadow .25s;
+  letter-spacing:.3px;
+}
+.card button::after{
+  content:"";position:absolute;top:0;left:-120%;
+  width:60%;height:100%;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.45),transparent);
+  transform:skewX(-20deg);
+  transition:left .6s ease;
+}
+.card:hover button::after{left:130%}
+.card button:hover{
+  transform:translateY(-1px);
+  box-shadow:0 8px 22px var(--glow);
+}
+.card button:active{transform:scale(.97)}
+
+/* ================= DETAIL ================= */
+#detail{
+  display:none;
+  max-width:900px;
+  margin:0 auto;
+  padding:24px 16px 40px;
+  animation:fadeUp .45s ease both;
+}
+.back{
+  background:var(--card);
+  border:1px solid var(--line);
+  color:var(--text);
+  padding:9px 16px;border-radius:10px;cursor:pointer;
+  margin-bottom:20px;
+  font-size:14px;
+  transition:transform .2s, background .2s, border-color .2s;
+}
+.back:hover{
+  background:var(--card-hover);
+  border-color:var(--accent);
+  transform:translateX(-3px);
+}
+.d-top{display:flex;gap:24px;flex-wrap:wrap}
+.d-img{
+  width:260px;max-width:100%;
+  aspect-ratio:1/1;
+  border-radius:20px;
+  background:#2a2e3d center/cover no-repeat;
+  border:1px solid var(--line);
+  box-shadow:0 18px 40px rgba(0,0,0,.5);
+  transition:transform .4s ease;
+}
+.d-img:hover{transform:scale(1.03) rotate(-1deg)}
+.d-info{flex:1;min-width:260px}
+.d-info h2{
+  margin-bottom:16px;font-size:26px;
+  background:linear-gradient(90deg,#fff,var(--accent));
+  -webkit-background-clip:text;background-clip:text;
+  -webkit-text-fill-color:transparent;
+}
+table{width:100%;border-collapse:collapse}
+td{
+  padding:11px 6px;
+  border-bottom:1px solid var(--line);
+  font-size:15px;
+  transition:background .2s;
+}
+tr:hover td{background:rgba(255,255,255,.03)}
+td:first-child{color:var(--muted);width:40%}
+.desc{
+  margin:22px 0;line-height:1.7;color:#cfd3e0;
+}
+.dl,.tutor{
+  display:block;text-align:center;
+  padding:15px;border-radius:14px;
+  color:#fff;font-size:18px;font-weight:800;
+  text-decoration:none;
+  position:relative;overflow:hidden;
+  transition:transform .25s, box-shadow .3s;
+  letter-spacing:.3px;
+}
+.dl{
+  background:linear-gradient(135deg,var(--accent),var(--accent-2));
+  box-shadow:0 10px 30px rgba(255,77,77,.3);
+}
+.tutor{
+  background:linear-gradient(135deg,#2d6cff,#1a4fd6);
+  margin-top:12px;
+  box-shadow:0 10px 30px rgba(45,108,255,.3);
+}
+.dl::after,.tutor::after{
+  content:"";position:absolute;top:0;left:-120%;
+  width:60%;height:100%;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.35),transparent);
+  transform:skewX(-20deg);
+  transition:left .7s ease;
+}
+.dl:hover::after,.tutor:hover::after{left:130%}
+.dl:hover,.tutor:hover{transform:translateY(-3px)}
+.dl:hover{box-shadow:0 16px 40px rgba(255,77,77,.45)}
+.tutor:hover{box-shadow:0 16px 40px rgba(45,108,255,.45)}
+.dl:active,.tutor:active{transform:scale(.98)}
+
+/* ================= FOOTER ================= */
+footer{
+  text-align:center;color:var(--muted);
+  padding:32px 24px;font-size:13px;
+  border-top:1px solid var(--line);
+  margin-top:20px;
+}
+
+/* ================= SCROLLBAR ================= */
+::-webkit-scrollbar{width:10px}
+::-webkit-scrollbar-track{background:#0b0d14}
+::-webkit-scrollbar-thumb{
+  background:linear-gradient(180deg,#2a3040,#1a1e2a);
+  border-radius:8px;border:2px solid #0b0d14;
+}
+::-webkit-scrollbar-thumb:hover{background:var(--accent)}
+
+/* ================= RESPONSIVE ================= */
+@media (max-width:600px){
+  header{padding:12px 14px}
+  .slider{width:calc(100% - 24px);margin-top:14px;border-radius:16px}
+  .section{padding:22px 14px}
+  .grid{grid-template-columns:repeat(auto-fill,minmax(145px,1fr));gap:14px}
+  .d-img{width:100%}
+  .d-info h2{font-size:22px}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <button id="burger" aria-label="Menu">&#9776;</button>
+  <h1 id="siteName"></h1>
+</header>
+
+<div id="overlay"></div>
+<nav id="drawer">
+  <h2>Menu</h2>
+  <button class="home" id="homeBtn">🏠 Beranda</button>
+  <a id="waLink" target="_blank" rel="noopener">📢 Ikuti Saluran WhatsApp</a>
+</nav>
+
+<main class="wrap">
+  <!-- HALAMAN UTAMA -->
+  <div id="home">
+    <div class="slider" id="slider"><div class="track" id="track"></div><div class="dots" id="dots"></div></div>
+    <div class="section">
+      <h3>🎮 Daftar Game</h3>
+      <div class="grid" id="grid"></div>
+    </div>
+  </div>
+
+  <!-- HALAMAN DETAIL -->
+  <div id="detail">
+    <button class="back" id="backBtn">← Kembali</button>
+    <div class="d-top">
+      <div class="d-img" id="dImg"></div>
+      <div class="d-info">
+        <h2 id="dName"></h2>
+        <table id="dTable"></table>
+      </div>
+    </div>
+    <p class="desc" id="dDesc"></p>
+    <a class="dl" id="dLink" target="_blank" rel="noopener">⬇ Download Game</a>
+    <a class="tutor" id="dTutor" target="_blank" rel="noopener">▶ Lihat Tutor Download</a>
+  </div>
+</main>
+<footer id="foot"></footer>
+
+<script>
+/* ============================================================
+   EDIT DI SINI SAJA
+   ============================================================ */
+const SITE_NAME  = "Ridwan Game Store";
+const WA_LINK    = "https://whatsapp.com/channel/GANTI_LINK_SALURAN_WA";   // ← link saluran WA kamu
+
+// Banner geser otomatis. Ukuran gambar 1200x400 px.
+const BANNERS = [
+  { image: "bener1.png.jpg", title: "Download Game Gratis", sub: "Pilih game, lihat detail, lalu download" },
+  { image: "bener2.png.jpg", title: "Game Terbaru", sub: "Update setiap hari" },
+  { image: "bener3.png.png", title: "Ikuti Saluran WhatsApp", sub: "Biar tidak ketinggalan info game" }
+];
+const BANNER_DELAY = 4000;
+
+const GAMES = [
+  {
+    name: "Nama Game 1",
+    image: "game1.jpg",
+    size: "250 MB",
+    platform: "Android",
+    version: "1.0.0",
+    genre: "Action",
+    developer: "Nama Developer",
+    update: "11 November 2026",
+    desc: "Tulis deskripsi singkat game di sini.",
+    download: "https://GANTI_LINK_DOWNLOAD_1",
+    tutor: "https://GANTI_LINK_VIDEO_TUTOR_1"
+  },
+  {
+    name: "Nama Game 2",
+    image: "game2.jpg",
+    size: "500 MB",
+    platform: "PC",
+    version: "2.1",
+    genre: "Racing",
+    developer: "Nama Developer",
+    update: "10 November 2026",
+    desc: "Tulis deskripsi singkat game di sini.",
+    download: "https://GANTI_LINK_DOWNLOAD_2",
+    tutor: "https://GANTI_LINK_VIDEO_TUTOR_2"
+  },
+  {
+    name: "Nama Game 3",
+    image: "",
+    size: "80 MB",
+    platform: "Android",
+    version: "1.3",
+    genre: "Puzzle",
+    developer: "Nama Developer",
+    update: "9 November 2026",
+    desc: "Tulis deskripsi singkat game di sini.",
+    download: "https://GANTI_LINK_DOWNLOAD_3",
+    tutor: "https://GANTI_LINK_VIDEO_TUTOR_3"
+  }
+];
+
+const DETAIL_FIELDS = [
+  ["Nama Game", "name"],
+  ["Ukuran", "size"],
+  ["Platform", "platform"],
+  ["Versi", "version"],
+  ["Genre", "genre"],
+  ["Developer", "developer"],
+  ["Update Terakhir", "update"]
+];
+/* ============================================================
+   SELESAI — kode di bawah tidak perlu diubah
+   ============================================================ */
+
+const $ = id => document.getElementById(id);
+const bg = src => src ? `url('${src}')` : "linear-gradient(135deg,#3a3f5c,#1a1d27)";
+
+document.title = SITE_NAME;
+$("siteName").textContent = SITE_NAME;
+$("foot").textContent = "© " + new Date().getFullYear() + " " + SITE_NAME;
+$("waLink").href = WA_LINK;
+
+// Banner slider
+let cur = 0, timer;
+BANNERS.forEach((b, i) => {
+  const sl = document.createElement("div");
+  sl.className = "slide";
+  sl.style.backgroundImage = bg(b.image);
+  sl.innerHTML = "<div><h2></h2><p></p></div>";
+  sl.querySelector("h2").textContent = b.title || "";
+  sl.querySelector("p").textContent = b.sub || "";
+  $("track").appendChild(sl);
+  const d = document.createElement("i");
+  d.onclick = () => { go(i); play(); };
+  $("dots").appendChild(d);
+});
+function go(n){
+  cur = (n + BANNERS.length) % BANNERS.length;
+  $("track").style.transform = "translateX(-" + cur * 100 + "%)";
+  [...$("dots").children].forEach((d, k) => d.classList.toggle("on", k === cur));
+}
+function play(){ clearInterval(timer); if (BANNERS.length > 1) timer = setInterval(() => go(cur + 1), BANNER_DELAY); }
+let sx = null;
+$("slider").addEventListener("pointerdown", e => sx = e.clientX);
+$("slider").addEventListener("pointerup", e => {
+  if (sx !== null && Math.abs(e.clientX - sx) > 40) { go(cur + (e.clientX < sx ? 1 : -1)); play(); }
+  sx = null;
+});
+go(0); play();
+
+// Menu garis tiga
+function toggleMenu(open){
+  $("drawer").classList.toggle("open", open);
+  $("overlay").classList.toggle("open", open);
+}
+$("burger").onclick = () => toggleMenu(true);
+$("overlay").onclick = () => toggleMenu(false);
+
+// Daftar game
+GAMES.forEach((g, i) => {
+  const c = document.createElement("div");
+  c.className = "card";
+  c.innerHTML = `<div class="img"></div><div class="t"><b></b><span></span><button>Detail</button></div>`;
+  c.querySelector(".img").style.backgroundImage = bg(g.image);
+  c.querySelector("b").textContent = g.name;
+  c.querySelector("span").textContent = g.platform + " • " + g.size;
+  c.onclick = () => showDetail(i);
+  $("grid").appendChild(c);
+});
+
+function showDetail(i){
+  const g = GAMES[i];
+  $("dImg").style.backgroundImage = bg(g.image);
+  $("dName").textContent = g.name;
+  $("dTable").innerHTML = DETAIL_FIELDS
+    .filter(f => g[f[1]])
+    .map(f => `<tr><td>${f[0]}</td><td></td></tr>`).join("");
+  const rows = $("dTable").querySelectorAll("tr");
+  DETAIL_FIELDS.filter(f => g[f[1]]).forEach((f, k) => rows[k].children[1].textContent = g[f[1]]);
+  $("dDesc").textContent = g.desc || "";
+  $("dLink").href = g.download;
+  $("dTutor").href = g.tutor || "#";
+  $("dTutor").style.display = g.tutor ? "block" : "none";
+  $("home").style.display = "none";
+  const d = $("detail");
+  d.style.display = "block";
+  // restart animasi
+  d.style.animation = "none";
+  void d.offsetWidth;
+  d.style.animation = "";
+  window.scrollTo(0, 0);
+}
+function showHome(){
+  $("detail").style.display = "none";
+  $("home").style.display = "block";
+  toggleMenu(false);
+  window.scrollTo(0, 0);
+}
+$("backBtn").onclick = showHome;
+$("homeBtn").onclick = showHome;
+$("siteName").onclick = showHome;
+</script>
+</body>
+</html>
